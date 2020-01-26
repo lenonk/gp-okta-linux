@@ -30,18 +30,28 @@ if [[ "${VPN_SERVER}" = "" ]]; then
 fi
 
 # start
-COOKIE=
-eval $( "/opt/gp-saml-gui/gp-saml-gui.py" -v "${VPN_SERVER}" )
-if ! [[ "${COOKIE}" = "" ]]; then
-    echo "${COOKIE}" | pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY openconnect \
-        --protocol=gp \
-        --user="${USER}" \
-        --usergroup=gateway:prelogin-cookie \
-        --os=win \
-        --csd-wrapper=/usr/libexec/openconnect/hipreport.sh \
-        --passwd-on-stdin \
-        --disable-ipv6 \
-        --background \
-        --pid-file=/var/run/gp-okta.pid \
-        "${VPN_SERVER}"
+output=`/opt/gp-saml-gui/gp-saml-gui.py --no-verify "${VPN_SERVER}"`
+
+tokens=(${output})
+for line in ${tokens[*]}; do
+    IFS='=' pair=(${line})
+    eval ${pair[0]}=${pair[1]}
+done
+
+if [ -z "${COOKIE}" ] || [ -z "${HOST}" ]; then
+    >&2 echo "\$HOST or \$COOKIE is not set."
+    echo "Host: ${HOST}"
+    echo "Cookie: ${COOKIE}"
 fi
+
+echo "${COOKIE}" | pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY openconnect \
+    --protocol=gp \
+    --user="${USER}" \
+    --usergroup=gateway:prelogin-cookie \
+    --os=win \
+    --csd-wrapper=/usr/libexec/openconnect/hipreport.sh \
+    --passwd-on-stdin \
+    --disable-ipv6 \
+    --background \
+    --pid-file=/var/run/gp-okta.pid \
+    "${HOST}"

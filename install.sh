@@ -75,8 +75,17 @@ elif ! [[ $(command -v "yum") = "" ]]; then
     install_conf "${VPN_SERVER}"
     install_hipreport
     install_gp_saml_gui
+# arch
+elif ! [[ $(command -v "pacman") = "" ]]; then
+    sudo pacman -Syy --noconfirm \
+        git wget openconnect \
+        python-gobject webkit2gtk \
+        python-lxml python-requests
+    install_conf "${VPN_SERVER}"
+    install_hipreport
+    install_gp_saml_gui
 # unknown
 else
-    >&2 echo "You are not running a Debian/Red Hat derivative. Sorry."
+    >&2 echo "You are not running a Debian/Red Hat/Arch derivative. Sorry."
     exit 1
 fi
