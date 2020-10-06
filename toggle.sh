@@ -2,7 +2,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-if [ -f /var/run/gp-okta.pid ] || [ "stop" == "${1}" ]; then
+if [ -f /tmp/gp-okta.pid ] || [ "stop" == "${1}" ]; then
     if [ "status" == "${1}" ]; then
         echo -n "started"
         exit 0

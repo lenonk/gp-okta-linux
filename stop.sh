@@ -4,6 +4,7 @@
 
 set -e
 
-if [ -f /var/run/gp-okta.pid ]; then
-    pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY kill "$(cat /var/run/gp-okta.pid)"
+if [ -f /tmp/gp-okta.pid ]; then
+#    pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY kill "$(cat /var/run/gp-okta.pid)"
+    env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY kill "$(cat /tmp/gp-okta.pid)"
 fi

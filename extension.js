@@ -76,7 +76,7 @@ function disable()
 
 function is_running()
 {
-    return `0` === run(`bash -c '[[ -f /var/run/gp-okta.pid ]]; echo -n $?'`);
+    return `0` === run(`bash -c '[[ -f /tmp/gp-okta.pid ]]; echo -n $?'`);
 }
 
 function run(cmd)

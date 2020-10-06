@@ -1,0 +1,1 @@
+KERNEL=="tun*", SUBSYSTEM=="misc", MODE="0666"

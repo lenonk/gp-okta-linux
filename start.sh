@@ -37,7 +37,8 @@ if [ -z "${COOKIE}" ] || [ -z "${HOST}" ]; then
     echo "Cookie: ${COOKIE}"
 fi
 
-echo "${COOKIE}" | pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY openconnect \
+#echo "${COOKIE}" | pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY openconnect \
+echo "${COOKIE}" | env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY openconnect \
     --protocol=gp \
     --user="${USER}" \
     --usergroup=gateway:prelogin-cookie \
@@ -47,5 +48,5 @@ echo "${COOKIE}" | pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY openconnec
     --passwd-on-stdin \
     --disable-ipv6 \
     --background \
-    --pid-file=/var/run/gp-okta.pid \
+    --pid-file=/tmp/gp-okta.pid \
     "${HOST}"

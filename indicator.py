@@ -98,7 +98,7 @@ class GpOktaLinuxIndicator:
         return False
 
     def is_running(self):
-        return os.path.isfile("/var/run/gp-okta.pid")
+        return os.path.isfile("/tmp/gp-okta.pid")
         
     def main(self):
         self.run_loop()
