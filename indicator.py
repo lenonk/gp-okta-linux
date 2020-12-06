@@ -28,7 +28,7 @@ from gi.repository import GLib
 class GpOktaLinuxIndicator:
     def __init__(self):
         # read configuration
-        command = shlex.split("env -i bash -c 'source /etc/gp-okta.conf && env'")
+        command = shlex.split("env -i bash -c 'source ~/.local/etc/gp-okta.conf && env'")
         proc = subprocess.Popen(command, stdout = subprocess.PIPE)
         for line in proc.stdout:
             (key, _, value) = line.decode('utf-8').partition("=")

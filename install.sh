@@ -4,43 +4,49 @@
 
 set -e
 
-# make sure script is running as root
-if ! [ $(id -u) = 0 ]; then
-    >&2 echo "Script should be run as root"
-    exit 1
-fi
+GP_OKTA_CONF=gp-okta.conf
+GP_OKTA_CONF_DIR=${HOME}/.local/etc
+
+GP_SAML_GUI=gp-saml-gui
+GP_SAML_GUI_DIR=${HOME}/.local/opt/gp-saml-gui
+
+HIPREPORT_DIR=${HOME}/.config/gp-saml-gui
+HIPREPORT_SCRIPT=hipreport.sh
 
 function install_conf {
-    if [ ! -f /etc/gp-okta.conf ]; then
-        echo "export VPN_SERVER=${1}" > /etc/gp-okta.conf
+
+    if [ ! -d ${GP_OKTA_CONF_DIR} ]; then
+        mkdir -p ${GP_OKTA_CONF_DIR};
+    fi
+
+    if [ ! -f ${GP_OKTA_CONF_DIR}/${GP_OKTA_CONF} ]; then
+        echo "export VPN_SERVER=${1}" > ${GP_OKTA_CONF_DIR}/${GP_OKTA_CONF}
     fi
 }
 
 function install_gp_saml_gui {
-    if [ ! -d /opt/gp-saml-gui ]; then
-        git clone https://github.com/dlenski/gp-saml-gui.git /opt/gp-saml-gui
+    if [ ! -d ${GP_SAML_GUI_DIR} ]; then
+        git clone https://github.com/dlenski/${GP_SAML_GUI}.git ${GP_SAML_GUI_DIR}
     fi
 }
 
 function install_hipreport {
-    HIPREPORT_SRC='https://raw.githubusercontent.com/dlenski/openconnect/master/hipreport.sh'
-    HIPREPORT_SCRIPT=/usr/libexec/openconnect/hipreport.sh
     # mkdir for sources, if not available
-    if [ ! -d /usr/libexec/openconnect ]; then
-        mkdir -p /usr/libexec/openconnect
+    if [ ! -d ${HIPREPORT_DIR} ]; then
+        mkdir -p ${HIPREPORT_DIR}
     fi
     # download HIP report script
-    if [ ! -f "${HIPREPORT_SCRIPT}" ]; then
-        wget -O "${HIPREPORT_SCRIPT}" "${HIPREPORT_SRC}"
-        chmod +x "${HIPREPORT_SCRIPT}"
+    if [ ! -f "${HIPREPORT_DIR}/${HIPREPORT_SCRIPT}" ]; then
+        cp ${HIPREPORT_SCRIPT} ${HIPREPORT_DIR}
+        chmod +x "${HIPREPORT_DIR}/${HIPREPORT_SCRIPT}"
     fi
 }
 
 # read desired VPN server here
 VPN_SERVER_ATTEMPTS=3
 VPN_SERVER=
-if [ -f /etc/gp-okta.conf ]; then
-    source /etc/gp-okta.conf
+if [ -f ${GP_OKTA_CONF_DIR}/${GP_OKTA_CONF} ]; then
+    source ${GP_OKTA_CONF_DIR}/${GP_OKTA_CONF}
 fi
 while [ "" = "${VPN_SERVER}" ]; do
     read -p "VPN Server: " VPN_SERVER
@@ -53,13 +59,13 @@ while [ "" = "${VPN_SERVER}" ]; do
 done
 
 if [ "" = "${VPN_SERVER}" ]; then
-    >&2 echo "VPN Server not set. Edit /etc/gp-okta.conf before starting VPN."
+    >&2 echo "VPN Server not set. Edit ${GP_OKTA_CONF_DIR}/${GP_OKTA_CONF} before starting VPN."
 fi
 
 # ubuntu
 if ! [[ $(command -v "apt") = "" ]]; then
-    apt update
-    apt -y install \
+    sudo apt update
+    sudo apt -y install \
         git wget openconnect \
         python3-gi gir1.2-gtk-3.0 gir1.2-webkit2-4.0 \
         python-lxml python-requests
@@ -68,10 +74,10 @@ if ! [[ $(command -v "apt") = "" ]]; then
     install_gp_saml_gui
 # centos
 elif ! [[ $(command -v "yum") = "" ]]; then
-    yum -y update
-    yum -y install epel-release
-    yum -y install openconnect vpnc-script
-    yum -y install git
+    sudo yum -y update
+    sudo yum -y install epel-release
+    sudo yum -y install openconnect vpnc-script
+    sudo yum -y install git
     install_conf "${VPN_SERVER}"
     install_hipreport
     install_gp_saml_gui
@@ -89,3 +95,6 @@ else
     >&2 echo "You are not running a Debian/Red Hat/Arch derivative. Sorry."
     exit 1
 fi
+
+./install_indicator.sh
+./add-udev-rule.sh
