@@ -5,11 +5,12 @@
 set -e
 
 #DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-INDICATOR_DIR=${HOME}/.local/opt
+INDICATOR_DIR=${HOME}/.local/opt/gp-saml-gui
 INDICATOR=indicator.py
 
 START_SCRIPT=start.sh
 STOP_SCRIPT=stop.sh
+ICONS=icons
 
 function install_indicator {
     if [ ! -d ${INDICATOR_DIR} ]; then
@@ -19,6 +20,7 @@ function install_indicator {
     cp ${INDICATOR} ${INDICATOR_DIR}
     cp ${START_SCRIPT} ${INDICATOR_DIR}
     cp ${STOP_SCRIPT} ${INDICATOR_DIR}
+    cp -rf ${ICONS} ${INDICATOR_DIR}
 }
 
 function create_desktop_file {
@@ -32,9 +34,8 @@ function create_desktop_file {
         echo "Terminal=false" >> "${desktop}"
         echo "Type=Application" >> "${desktop}"
         echo "Categories=" >> "${desktop}"
-        #echo "Exec=bash -c 'cd ${DIR} && ./indicator.py'" >> "${desktop}"
-        echo "Exec=bash -c '${INDICATOR_DIR}/${INDICATOR}'" >> "${desktop}"
-        echo "Icon=${DIR}/icons/connected.svg" >> "${desktop}"
+        echo "Exec=bash -c 'cd ${INDICATOR_DIR} && ./${INDICATOR}'" >> "${desktop}"
+        echo "Icon=${INDICATOR_DIR}/icons/disconnected.svg" >> "${desktop}"
     fi
 }
 
